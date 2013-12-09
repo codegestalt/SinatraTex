@@ -14,18 +14,11 @@ document_top = "\\documentclass{article}
 \\begin{document}
 \\pagestyle{empty}
 $"
-# \\usepackage{amssymb,amsmath}
-# \\usepackage{mathtools}
-# \\usepackage{dsfont}
-# \\everymath{\displaystyle}
 
 document_bottom = "$
 \\end{document}"
 
-# Document resolutions, hardcoded. This is the result of:
-# >>> MAX_RES = 10
-# >>> [int(round(100*2**(i/4.0))) for i in range(MAX_RES+1)]
-# resolutions = [100, 119, 141, 168, 200, 238, 283, 336, 400, 476, 566]
+# Document resolution, hardcoded.
 resolution = 119
 
 get "/" do
@@ -46,11 +39,6 @@ get "/" do
     return File.read(File.join(png_path))
   end
 
-  # if not int(size) in range(1, 11):
-  #   log("err", "Size %s not in range (1 to 10)" % size)
-  #   return ErrorImage()
-  # end
-
   # Assemble the complete document source code (head + corp + foot)
   complete_tex_doc = "%s%s%s" % [document_top, tex, document_bottom]
 
@@ -62,7 +50,6 @@ get "/" do
 
   # Convert to dvi
   system("latex --interaction=nonstopmode -output-directory=%s %s" % [TEMP_DVI, tex_path])
-  # log("render", "%s (size=%s)" % (tex, size))
 
   # We do not need the tex file anymore
   system("rm %s" % [tex_path])
@@ -75,7 +62,6 @@ get "/" do
 
     # Convert to png
     system("dvipng -T tight -bg Transparent -D %s -o %s %s" % [resolution, png_path, dvi_path])
-    # system("dvipng -T tight -bg Transparent -D %s -o %s %s" % (resolutions[int(size)], png_path, dvi_path))
 
     # Remove the dvi file
     system("rm %s" % [dvi_path])
@@ -84,11 +70,6 @@ get "/" do
     content_type "image/png"
     File.read(File.join(png_path))
   else
-    # # Something nasty happened during the compilation
-    # # 1) Log it
-    # dvi_log_path = "%s/%s.log" % (TEMP_DVI, uid)
-    # log("err", "The compilation failed, see %s in the dvi temporary directory" % dvi_log_path)
-    # # 2) Excuse
-    # return ErrorImage()
+    # TODO: Log when something nasty happened during the compilation
   end
 end
