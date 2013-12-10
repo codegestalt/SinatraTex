@@ -5,9 +5,6 @@
 worker_processes 1
 working_directory @dir
 
-system("export PATH=/usr/local/texlive/2013/bin/x86_64-linux:$PATH")
-puts system("which latex")
-
 timeout 30
 
 # Specify path to socket unicorn listens to, 

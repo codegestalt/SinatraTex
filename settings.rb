@@ -1,6 +1,8 @@
 ### Variables which are good to tweak ###
 require 'fileutils'
 
+## Check for latex
+
 # Main Path
 output_temp_dir = "./tmp/sinatratex"
 FileUtils.mkdir_p(output_temp_dir) unless File.exists?(output_temp_dir)
