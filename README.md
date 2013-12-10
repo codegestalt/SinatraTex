@@ -10,10 +10,6 @@ A Sinatra Web App which lets you convert LaTeX to different formats (pdf/png)
 4. Run bundler `bundle install`
 5. Start the Rack server `bundle exec rackup`
 
-## Todo
-
-* Add log
-
 ## Install
 
 ### STIX Fonts

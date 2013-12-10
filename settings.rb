@@ -23,7 +23,6 @@ FileUtils.mkdir_p(TEMP_TEX) unless File.exists?(TEMP_TEX)
 
 # Loggin access and errors
 LOGFILE = "%s/log" % output_temp_dir
-FileUtils.mkdir_p(LOGFILE) unless File.exists?(LOGFILE)
 
 TEX_BLACKLIST = ["\\def", "\\let", "\\futurelet",
         "\\newcommand", "\\renewcommand", "\\else", "\\fi", "\\write",

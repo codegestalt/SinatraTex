@@ -14,6 +14,14 @@ load 'settings.rb'
 
 class SinatraTex < Sinatra::Base
 
+  def log(type, msg)
+    remote_ip = request.ip
+    date = Time.now.strftime("%d/%b/%Y %T %Z")
+    f = open(LOGFILE, 'a')
+    f.write("%s [%s] %s \"%s\"\n" % [remote_ip, date, type, msg])
+    f.close()
+  end
+
   post "/pdf" do
     name = params[:name]
     tex  = params[:tex]
@@ -29,6 +37,7 @@ class SinatraTex < Sinatra::Base
     # This file already exists
     if File.exists?(pdf_path)
       # Return existing pdf
+      log("render pdf", "%s" % [name])
       content_type "application/pdf"
       return File.read(File.join(pdf_path))
     end
@@ -39,9 +48,14 @@ class SinatraTex < Sinatra::Base
     tex_file.close
 
     system("pdflatex --interaction=nonstopmode -output-directory=%s %s" % [TEMP_PDF, tex_path])
+    log("render pdf", "%s" % [name])
+
     if File.exists?(pdf_path)
       content_type "application/pdf"
       return File.read(File.join(pdf_path))
+    else
+      dvi_log_path = "%s/%s.log" % [TEMP_DVI, uid]
+      log("error", "The compilation failed, see %s in the dvi temporary directory" % [dvi_log_path])
     end
   end
 
@@ -76,6 +90,7 @@ class SinatraTex < Sinatra::Base
     # This file already exists
     if File.exists?(png_path)
       # Return existing image
+      log("render png", "%s" % [tex])
       content_type "image/png"
       return File.read(File.join(png_path))
     end
@@ -91,6 +106,7 @@ class SinatraTex < Sinatra::Base
 
     # Convert to dvi
     system("latex --interaction=nonstopmode -output-directory=%s %s" % [TEMP_DVI, tex_path])
+    log("render png", "%s" % [tex])
 
     # We do not need the tex file anymore
     system("rm %s" % [tex_path])
@@ -111,7 +127,8 @@ class SinatraTex < Sinatra::Base
       content_type "image/png"
       File.read(File.join(png_path))
     else
-      # TODO: Log when something nasty happened during the compilation
+      dvi_log_path = "%s/%s.log" % [TEMP_DVI, uid]
+      log("error", "The compilation failed, see %s in the dvi temporary directory" % [dvi_log_path])
     end
   end
 
