@@ -1,8 +1,10 @@
-# Tex2Png - A Sinatra Web App which lets you convert LaTeX mathematical formulas to png images via http requests.
+# SinatraTex - A Sinatra Web App which lets you convert LaTeX to different formats (pdf/png)
 #
-# Dependencies: LaTeX
+# 1) post to /pdf converts tex to pdf      | params: { name: 'filename', tex: 'tex' }
+# 2) get  to /png converts math tex to png | params: { tex: "y=f(x)" }
+#    Example: localhost:9292/png?tex=y=f(x)
 #
-# Inspired by Tex2Png by Thomas Pelletier (https://github.com/pelletier/tex2png)
+# Dependencies: LaTeX, STIX Fonts
 
 require "rubygems"
 require "sinatra/base"
@@ -10,7 +12,7 @@ require 'digest'
 require 'json'
 load 'settings.rb'
 
-class Tex2Png < Sinatra::Base
+class SinatraTex < Sinatra::Base
 
   post "/pdf" do
     name = params[:name]
@@ -43,6 +45,7 @@ class Tex2Png < Sinatra::Base
     end
   end
 
+  # The png conversion is based on Thomas Pelletier's Tex2Png (https://github.com/pelletier/tex2png), thanks for the bacon!
   get "/png" do
 
     # LaTeX document skeleton

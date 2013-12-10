@@ -1,7 +1,6 @@
-Tex2Png - A Sinatra Web App which lets you convert LaTeX mathematical formulas to png images via http requests.
+# SinatraTex - A Sinatra Web App which lets you convert LaTeX to different formats (pdf/png)
 
-Copyright (c) 2010 Thomas Pelletier <pelletier.thomas@gmail.com> - Python Version: https://github.com/pelletier/tex2png
-Copyright (c) 2013 Codegestalt      <contact@codegestalt.com>    - Ruby Version    https://github.com/codegestalt/tex2png
+Copyright (c) 2013 Codegestalt <contact@codegestalt.com> - Ruby Version    https://github.com/codegestalt/sinatratex
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
