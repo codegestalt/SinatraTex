@@ -6,22 +6,42 @@
 
 require 'sinatra'
 require 'digest'
+require 'json'
 load 'settings.rb'
 
-# LaTeX document skeleton
-document_top = "\\documentclass{article}
-\\everymath{\\displaystyle}
-\\begin{document}
-\\pagestyle{empty}
-$"
+post "/pdf" do
+  tex = params[:tex]
 
-document_bottom = "$
-\\end{document}"
+  tex_path = '%s/%s.tex' % [TEMP_TEX, "test"]
+  tex_file = File.open(tex_path, 'w')
+  tex_file.write(tex)
+  tex_file.close
 
-# Document resolution, hardcoded.
-resolution = 119
+  system("pdflatex --interaction=nonstopmode -output-directory=%s %s" % [TEMP_PDF, tex_path])
+  pdf_path = "%s/%s.pdf" % [TEMP_PDF, "test"]
+  if File.exists?(pdf_path)
+    content_type "application/pdf"
+    return File.read(File.join(pdf_path))
+  end
+end
 
-get "/" do
+get "/png" do
+
+  # LaTeX document skeleton
+  document_top = "\\documentclass{article}
+  \\usepackage{stix}
+  \\usepackage{mathtools}
+  \\everymath{\\displaystyle}
+  \\begin{document}_data
+  \\pagestyle{empty}
+  $"
+
+  document_bottom = "$
+  \\end{document}"
+
+  # Document resolution, hardcoded.
+  resolution = 119
+
   tex = params[:tex]
 
   # Prepare data

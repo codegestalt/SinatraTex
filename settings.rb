@@ -4,6 +4,9 @@
 output_temp_dir = "/tmp/tex2png"
 
 # Temporary dvi file
+TEMP_PDF = "%s/pdf" % output_temp_dir
+
+# Temporary dvi file
 TEMP_DVI = "%s/dvi" % output_temp_dir
 
 # Temporary png file
