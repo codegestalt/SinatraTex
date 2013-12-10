@@ -2,7 +2,7 @@
 require 'fileutils'
 
 # Main Path
-output_temp_dir = "./tmp/tex2png"
+output_temp_dir = "./tmp/sinatratex"
 FileUtils.mkdir_p(output_temp_dir) unless File.exists?(output_temp_dir)
 
 # Temporary pdf file
