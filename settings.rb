@@ -2,7 +2,7 @@
 require 'fileutils'
 
 # Main Path
-output_temp_dir = "/tmp/tex2png"
+output_temp_dir = "./tmp/tex2png"
 Dir.mkdir(output_temp_dir) unless File.exists?(output_temp_dir)
 
 # Temporary dvi file
