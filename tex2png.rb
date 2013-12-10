@@ -4,92 +4,112 @@
 #
 # Inspired by Tex2Png by Thomas Pelletier (https://github.com/pelletier/tex2png)
 
-require 'sinatra'
+require "rubygems"
+require "sinatra/base"
 require 'digest'
 require 'json'
 load 'settings.rb'
 
-post "/pdf" do
-  tex = params[:tex]
+class Tex2Png < Sinatra::Base
 
-  tex_path = '%s/%s.tex' % [TEMP_TEX, "test"]
-  tex_file = File.open(tex_path, 'w')
-  tex_file.write(tex)
-  tex_file.close
+  post "/pdf" do
+    name = params[:name]
+    tex  = params[:tex]
 
-  system("pdflatex --interaction=nonstopmode -output-directory=%s %s" % [TEMP_PDF, tex_path])
-  pdf_path = "%s/%s.pdf" % [TEMP_PDF, "test"]
-  if File.exists?(pdf_path)
-    content_type "application/pdf"
-    return File.read(File.join(pdf_path))
-  end
-end
+    # Prepare data
+    m = Digest::MD5.new
+    m.update("%s%s" % [name, tex])
+    uid = m.hexdigest
 
-get "/png" do
+    # Compute the resulting pdf path
+    pdf_path = "%s/%s.pdf" % [TEMP_PDF, uid]
 
-  # LaTeX document skeleton
-  document_top = "\\documentclass{article}
-  \\usepackage{stix}
-  \\usepackage{mathtools}
-  \\everymath{\\displaystyle}
-  \\begin{document}_data
-  \\pagestyle{empty}
-  $"
+    # This file already exists
+    if File.exists?(pdf_path)
+      # Return existing pdf
+      content_type "application/pdf"
+      return File.read(File.join(pdf_path))
+    end
 
-  document_bottom = "$
-  \\end{document}"
+    tex_path = '%s/%s.tex' % [TEMP_TEX, uid]
+    tex_file = File.open(tex_path, 'w')
+    tex_file.write(tex)
+    tex_file.close
 
-  # Document resolution, hardcoded.
-  resolution = 119
-
-  tex = params[:tex]
-
-  # Prepare data
-  m = Digest::MD5.new
-  m.update("%s" % [tex])
-  uid = m.hexdigest
-
-  # Compute the resulting png path
-  png_path = "%s/%s.png" % [TEMP_PNG, uid]
-
-  # This file already exists
-  if File.exists?(png_path)
-    # Return existing image
-    content_type "image/png"
-    return File.read(File.join(png_path))
+    system("pdflatex --interaction=nonstopmode -output-directory=%s %s" % [TEMP_PDF, tex_path])
+    if File.exists?(pdf_path)
+      content_type "application/pdf"
+      return File.read(File.join(pdf_path))
+    end
   end
 
-  # Assemble the complete document source code (head + corp + foot)
-  complete_tex_doc = "%s%s%s" % [document_top, tex, document_bottom]
+  get "/png" do
 
-  # Write the tex file
-  tex_path = '%s/%s.tex' % [TEMP_TEX, uid]
-  tex_file = File.open(tex_path, 'w')
-  tex_file.write(complete_tex_doc)
-  tex_file.close()
+    # LaTeX document skeleton
+    document_top = "\\documentclass{article}
+    \\usepackage{stix}
+    \\usepackage{mathtools}
+    \\everymath{\\displaystyle}
+    \\begin{document}
+    \\pagestyle{empty}
+    $"
 
-  # Convert to dvi
-  system("latex --interaction=nonstopmode -output-directory=%s %s" % [TEMP_DVI, tex_path])
+    document_bottom = "$
+    \\end{document}"
 
-  # We do not need the tex file anymore
-  system("rm %s" % [tex_path])
+    # Document resolution, hardcoded.
+    resolution = 119
 
-  # Compute the complete dvi file path
-  dvi_path = "%s/%s.dvi" % [TEMP_DVI, uid]
+    tex = params[:tex]
 
-  # The compilation succeeded, have fun with png
-  if File.exists?(dvi_path)
+    # Prepare data
+    m = Digest::MD5.new
+    m.update("%s" % [tex])
+    uid = m.hexdigest
 
-    # Convert to png
-    system("dvipng -T tight -bg Transparent -D %s -o %s %s" % [resolution, png_path, dvi_path])
+    # Compute the resulting png path
+    png_path = "%s/%s.png" % [TEMP_PNG, uid]
 
-    # Remove the dvi file
-    system("rm %s" % [dvi_path])
+    # This file already exists
+    if File.exists?(png_path)
+      # Return existing image
+      content_type "image/png"
+      return File.read(File.join(png_path))
+    end
 
-    # Return the result of our beautiful work
-    content_type "image/png"
-    File.read(File.join(png_path))
-  else
-    # TODO: Log when something nasty happened during the compilation
+    # Assemble the complete document source code (head + corp + foot)
+    complete_tex_doc = "%s%s%s" % [document_top, tex, document_bottom]
+
+    # Write the tex file
+    tex_path = '%s/%s.tex' % [TEMP_TEX, uid]
+    tex_file = File.open(tex_path, 'w')
+    tex_file.write(complete_tex_doc)
+    tex_file.close()
+
+    # Convert to dvi
+    system("latex --interaction=nonstopmode -output-directory=%s %s" % [TEMP_DVI, tex_path])
+
+    # We do not need the tex file anymore
+    system("rm %s" % [tex_path])
+
+    # Compute the complete dvi file path
+    dvi_path = "%s/%s.dvi" % [TEMP_DVI, uid]
+
+    # The compilation succeeded, have fun with png
+    if File.exists?(dvi_path)
+
+      # Convert to png
+      system("dvipng -T tight -bg Transparent -D %s -o %s %s" % [resolution, png_path, dvi_path])
+
+      # Remove the dvi file
+      system("rm %s" % [dvi_path])
+
+      # Return the result of our beautiful work
+      content_type "image/png"
+      File.read(File.join(png_path))
+    else
+      # TODO: Log when something nasty happened during the compilation
+    end
   end
+
 end
