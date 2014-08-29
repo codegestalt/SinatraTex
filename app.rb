@@ -23,8 +23,20 @@ class SinatraTex < Sinatra::Base
   end
 
   post "/pdf" do
-    name = params[:name]
-    tex  = params[:tex]
+    name   = params[:name]
+    tex    = params[:tex]
+    images = JSON.parse(params[:images]) if params[:images]
+
+    # Prepare images
+    if images && images.any?
+      images.each do |image|
+        # Check if image with same name exists, if not download it with wget
+        image_path = "%s/%s" % [TEMP_IMAGES, image["name"]]
+        unless File.exists?(image_path)
+          system("wget '#{image["url"]}' -O '#{image_path}'")
+        end
+      end
+    end
 
     # Prepare data
     m = Digest::MD5.new

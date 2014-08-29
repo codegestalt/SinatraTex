@@ -19,6 +19,10 @@ FileUtils.mkdir_p(TEMP_DVI) unless File.exists?(TEMP_DVI)
 TEMP_PNG = "%s/png" % output_temp_dir
 FileUtils.mkdir_p(TEMP_PNG) unless File.exists?(TEMP_PNG)
 
+# Temporary png file
+TEMP_IMAGES = "%s/images" % output_temp_dir
+FileUtils.mkdir_p(TEMP_IMAGES) unless File.exists?(TEMP_IMAGES)
+
 # Temporary tex file
 TEMP_TEX = "%s/tex" % output_temp_dir
 FileUtils.mkdir_p(TEMP_TEX) unless File.exists?(TEMP_TEX)
