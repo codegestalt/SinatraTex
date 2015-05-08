@@ -59,7 +59,8 @@ class SinatraTex < Sinatra::Base
     tex_file.write(tex)
     tex_file.close
 
-    system("pdflatex --interaction=nonstopmode -output-directory=%s %s" % [TEMP_PDF, tex_path])
+    # system("pdflatex --interaction=nonstopmode -output-directory=%s %s" % [TEMP_PDF, tex_path])
+    system("latexmk -pdf -output-directory=%s %s" % [TEMP_PDF, tex_path])
     log("render pdf", "%s" % [name])
 
     if File.exists?(pdf_path)
