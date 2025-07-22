@@ -33,7 +33,7 @@ class SinatraTex < Sinatra::Base
         # Check if image with same name exists, if not download it with wget
         image_path = "%s/%s" % [TEMP_IMAGES, image["name"]]
         unless File.exists?(image_path)
-          system("wget '#{image["url"]}' -O '#{image_path}'")
+          system("wget '#{image["url"]}' -O '#{image_path}' --no-check-certificate")
         end
       end
     end
